@@ -111,3 +111,56 @@ filtered_df = filtered_df.fillna(method='ffill').fillna(method='bfill')
 
 # Pivot the dataframe
 pivot_df = filtered_df.pivot_table(index='Country Name', columns='Indicator Name', values='2020')
+
+
+# In[7]:
+
+
+labels = ["Agricultural land", "Forest area", "CO2 emissions", "Methane emissions", "Nitrous oxide emissions", 
+          "Total greenhouse gas emissions", "Renewable electricity output", "Renewable energy consumption"]
+
+
+# In[8]:
+
+
+# Correlation
+corr = pivot_df.corr()
+mask = np.triu(np.ones_like(corr, dtype=bool))
+sns.heatmap(corr, mask=mask, cmap='coolwarm', annot=True, fmt='.2f', xticklabels=labels, yticklabels=labels)
+plt.title('Correlation between environmental factors')
+plt.show()
+
+
+# In[9]:
+
+
+# Ploting Highest Forest area Countries
+temp = pivot_df[["Forest area (% of land area)"]].sort_values(by="Forest area (% of land area)", ascending=False).iloc[:30]
+temp.plot(kind="bar", figsize=(12, 5))
+plt.ylabel("Forest Area")
+plt.title("Forest of area of Countries")
+plt.show()
+
+
+# ## Clustering
+
+# In[10]:
+
+
+# Normalize the dataset
+scaler = StandardScaler()
+normalized_data = scaler.fit_transform(pivot_df.values)
+
+
+# In[11]:
+
+
+# Choose the number of clusters
+n_clusters = 3
+
+# Perform clustering using KMeans
+kmeans = KMeans(n_clusters=n_clusters, random_state=0)
+labels = kmeans.fit_predict(normalized_data)
+
+# Add the cluster labels to the dataset
+pivot_df["Cluster"] = labels
