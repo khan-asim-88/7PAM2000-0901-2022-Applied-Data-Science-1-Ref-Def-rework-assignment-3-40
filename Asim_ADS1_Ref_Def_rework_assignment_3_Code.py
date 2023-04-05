@@ -164,3 +164,69 @@ labels = kmeans.fit_predict(normalized_data)
 
 # Add the cluster labels to the dataset
 pivot_df["Cluster"] = labels
+
+
+# In[12]:
+
+
+# Create a scatter plot with the specified columns and labels
+plt.figure(figsize=(10, 5))
+plt.scatter(pivot_df['Methane emissions (kt of CO2 equivalent)'],
+            pivot_df['CO2 emissions (metric tons per capita)'],
+            c=pivot_df['Cluster'])
+
+# Add axis labels and a title to the plot
+plt.xlabel('Methane emissions (kt of CO2 equivalent)')
+plt.ylabel('CO2 emissions (metric tons per capita)')
+plt.title('CO2 vs Methane Emissions by Cluster')
+
+# Show the plot
+plt.show()
+
+
+# In[13]:
+
+
+# Create a scatter plot with the specified columns and labels
+plt.figure(figsize=(10, 5))
+plt.scatter(pivot_df['Forest area (% of land area)'],
+            pivot_df['Agricultural land (% of land area)'],
+            c=pivot_df['Cluster'])
+
+# Add axis labels and a title to the plot
+plt.xlabel('Forest area (% of land area)')
+plt.ylabel('Agricultural land (% of land area)')
+plt.title('Forest vs Agriculture Land by Cluster')
+
+# Show the plot
+plt.show()
+
+
+# In[14]:
+
+
+pivot_df.groupby("Cluster").mean()
+
+
+# In[25]:
+
+
+labels = ["Agricultural land", "Forest area", "CO2 emissions", "Methane emissions", "Nitrous oxide emissions", 
+          "Total greenhouse gas emissions", "Renewable electricity output", "Renewable energy consumption"]
+
+
+# In[31]:
+
+
+temp = pivot_df.groupby("Cluster").mean().T
+temp.index = labels[:6]
+
+
+# In[34]:
+
+
+temp.plot(kind="bar", figsize=(14, 5))
+plt.title("Mean of Indicators w.r.t Clusters")
+plt.ylabel("Mean Value")
+plt.xlabel("Indicator")
+plt.show()
