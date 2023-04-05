@@ -54,3 +54,60 @@ def read_worldbank_data(filename):
 
 
 df, countries = read_worldbank_data("dataset.csv")
+
+
+# In[3]:
+
+
+# Function to filter the data
+def filter_data(df, indicators):
+    """
+    Function is used to extract specific data from the dataframe
+    
+    Parameters:
+        df: Total Dataframe
+        indicators: The indicators for which data has to be extracted.
+        
+    Returns:
+        filtered_df: Extracted data
+    """
+    
+    # Filter the dataset for the required indicators
+    filtered_df = df[df["Indicator Name"].isin(indicators)]
+    
+    # Extracting data for only countries
+    country_names = [country.name for country in list(pycountry.countries)]
+    filtered_df = filtered_df[filtered_df["Country Name"].isin(country_names)]
+    
+    return filtered_df
+
+
+# In[4]:
+
+
+indicators = [
+    'Agricultural land (% of land area)',
+    'Forest area (% of land area)',
+    'CO2 emissions (metric tons per capita)',
+    'Methane emissions (kt of CO2 equivalent)',
+    'Nitrous oxide emissions (thousand metric tons of CO2 equivalent)',
+    'Total greenhouse gas emissions (kt of CO2 equivalent)',
+    'Renewable electricity output (% of total electricity output)'
+    'Renewable energy consumption (% of total final energy consumption)',
+]
+
+filtered_df = filter_data(df, indicators)
+
+
+# In[5]:
+
+
+# Handle missing values
+filtered_df = filtered_df.fillna(method='ffill').fillna(method='bfill')
+
+
+# In[6]:
+
+
+# Pivot the dataframe
+pivot_df = filtered_df.pivot_table(index='Country Name', columns='Indicator Name', values='2020')
