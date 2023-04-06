@@ -230,3 +230,115 @@ plt.title("Mean of Indicators w.r.t Clusters")
 plt.ylabel("Mean Value")
 plt.xlabel("Indicator")
 plt.show()
+
+
+# In[16]:
+
+
+# Selecting one country from each cluster
+pivot_df.groupby("Cluster").last()
+
+
+# In[17]:
+
+
+# Comapring values for each country
+pivot_df.groupby("Cluster").last().plot(kind="bar", figsize=(16, 6))
+plt.title("Comparison for country per cluster")
+plt.ylabel("Value")
+plt.show()
+
+
+# ## Series Model
+
+# In[18]:
+
+
+def linear_func(x, a, b):
+    """
+    Computes the linear function y = a*x + b.
+
+    Parameters
+    ----------
+    x : float or array-like
+        The input value(s) for the function.
+    a : float
+        The slope of the linear function.
+    b : float
+        The y-intercept of the linear function.
+
+    Returns
+    -------
+    float or array-like
+        The output value(s) of the linear function.
+    """
+    return a*x + b
+
+
+# In[19]:
+
+
+def model_data(x_data, y_data, linear_func, sigma=[1.0, 1.0]):
+    """
+    Fits a given model function to the provided data, generates predictions for
+    future years, estimates confidence intervals, and plots the results.
+
+    Parameters
+    ----------
+    x_data : array-like
+        The x values (independent variable) for the data to be fit.
+    y_data : array-like
+        The y values (dependent variable) for the data to be fit.
+    linear_func : callable
+        A function that represents the model to be fit to the data.
+    sigma : list, optional
+        A list containing the number of standard deviations for the confidence
+        intervals to be computed. The first element represents the sigma value
+        for the model parameters, and the second element represents the sigma
+        value for the predicted values. Defaults to [1.0, 1.0].
+
+    Returns
+    -------
+    None
+        The function generates a plot of the fitted function, predicted values,
+        and confidence intervals.
+
+    """
+    
+    # perform the curve fit
+    popt, pcov = curve_fit(linear_func, x_data, y_data)
+    
+    # define an array of x values representing future years
+    x_pred = np.arange(2022, 2042)
+
+    # generate y values for the predicted years using the model function
+    y_pred = linear_func(x_pred, *popt)
+    
+    # generate lower and upper limits for the predicted values using err_ranges
+    lower, upper = err_ranges(x_pred, linear_func, popt, sigma)
+    
+    print(f"Predictions are...")
+    print(y_pred)
+    
+    # plot the model function and the confidence intervals for the predictions
+    plt.figure(figsize=(12, 5))
+    plt.plot(x_data, y_data, 'bo', label='Data')
+    plt.plot(x_pred, y_pred, 'r-', label='Linear Fit')
+    plt.fill_between(x_pred, lower, upper, color='green', alpha=0.2, label='Confidence Interval')
+    plt.legend(loc='best')
+    plt.title("Population Prediction with Simple Model")
+    plt.xlabel('Year')
+    plt.ylabel('Total Population')
+    plt.show()
+
+
+# In[20]:
+
+
+# extract the data we want to fit the model to
+data = countries[("World", "Population, total")]
+
+X = data.index.astype("int")
+y = data.values.astype("float64")
+
+model_data(X, y, linear_func)
